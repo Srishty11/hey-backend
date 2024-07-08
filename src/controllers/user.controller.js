@@ -14,9 +14,24 @@ const registerUser = asyncHandler( async (req,res) => {
     ) {
        throw new ApiError(400,"All fields are requied")
     }
+    const existedUser = await User.findOne({
+        $or: [{ username },{ email }]
+    })
 
-    const avatarLocalPath = req.files?.avatar.[0]?.path;
+    if(existedUser){
+        throw new ApiError(409,"User with email or username already exist")
+    }
+// console.log(req.files);
+
+    const avatarLocalPath = req.files?.avatar[0]?.path;
     const coverImageLocalPath = req.files?.coverImage[0]?.path; 
+
+     /*// Classic way to check path
+    let coverImageLocalPath;
+    if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0 ){
+        coverImageLocalPath = req.files.coverImage[0]
+    } */
+
 
     if (!avatarLocalPath){
         throw new ApiError(400,"Avatar file is required")
@@ -24,6 +39,7 @@ const registerUser = asyncHandler( async (req,res) => {
 
     const avatar = await uploadOnCloudinary(avatarLocalPath)
     const coverImage = await uploadOnCloudinary(coverImageLocalPath)
+
     // again check for Avatar because it is important field
     if(!avatar) {
         throw new ApiError(400,"Avatar  is required")
@@ -42,14 +58,14 @@ const registerUser = asyncHandler( async (req,res) => {
     "-password -refreshToken"   // -ve means ye nhi chaiye
   )
 
-  if(!createdUser){  //agr created user nhi hai
+  if(!createdUser){  //agr createduser nhi hai
       throw new ApiError(500, "Something went wrong while registering the user")
   }
 
   return res.status(201).json(
     new ApiResponse(200, createdUser, "User Registered Successfully")
   )
-  
+
 } )
 
 
