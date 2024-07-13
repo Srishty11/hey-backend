@@ -45,7 +45,7 @@ router.route("/register").post(     //middleware injectd just before registerUse
 
         router
         .route("/cover-image")
-        .patch(verifyJWT, upload.single("/coverImage"), updateUserCoverImage)
+        .patch(verifyJWT, upload.single("coverImage"), updateUserCoverImage)
 
         router.route("/c/:username").get(verifyJWT. getUserChannelProfile)  // when u use param
 
